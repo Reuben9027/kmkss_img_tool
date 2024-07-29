@@ -6,7 +6,8 @@ This project uses the following third-party libraries:
 
 # kmkss_img_tool
  An extraction tool for a certain ps2 visualnovel
- //noted havent fully tested this ingame tho it boots the game
+ 
+ //note: havent fully tested this ingame tho it boots the game
 
 
 This project is based on amg_codec_tool's documentation (rev 0.5)
@@ -36,39 +37,39 @@ Parameters
 
 6 : ARC to IMG
 
-# Parameters
+## Parameters
 
-## Parameter 1:
+### Parameter 1:
 
 This will ask for an arc file to be extracted to JSON and scfTemp files in JSONextract and SCFextract folders.
 This will also make tmp.list files which will list all scffile names based on the arc file. 
 
 
-## Parameter 2:
+### Parameter 2:
 
 This will ask for a folder cotaining JSON files and convert it to scf Files and be saved on SCFconvert
 
 
-## Parameter 3:
+### Parameter 3:
 
 Will ask for folder containing SCF files to be converted to ARC file
 Filename: SCF_to_ARC.ARC
 
 
-## Parameter 5:
+### Parameter 5:
 
 Will ask for IMG file to be conveted to arc File
 Filename: IMG_to_ARC.ARC
 
 
-## Parameter 6:
+### Parameter 6:
 
 Will ask for ARC file to be converte to IMG file
 Filename: ARC_to_IMG.IMG
 
 
 
-# JSON FILES 
+## JSON FILES 
 
 Just like in amg_codec_tool the project have a human readable file format for editing scripts for translation in json format
 and also has similar format as the xml in amgtool
@@ -128,4 +129,3 @@ and others contributed for amagami translations
 
 //will fix this readme in december sorry for bed england
 
-//dont expect this program to fully working on game
