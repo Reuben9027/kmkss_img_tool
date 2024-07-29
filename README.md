@@ -6,6 +6,7 @@ This project uses the following third-party libraries:
 
 # kmkss_img_tool
  An extraction tool for a certain ps2 visualnovel
+ //noted havent fully tested this ingame tho it boots the game
 
 
 This project is based on amg_codec_tool's documentation (rev 0.5)
@@ -126,3 +127,5 @@ and others contributed for amagami translations
 ## to do
 
 //will fix this readme in december sorry for bed england
+
+//dont expect this program to fully working on game
