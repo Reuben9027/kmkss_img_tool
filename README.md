@@ -1,11 +1,11 @@
-# kmkss_img_tool
- An extraction tool for a certain ps2 visualnovel
-
 ## Third-Party Libraries
 
 This project uses the following third-party libraries:
 
 - [json-simple](https://code.google.com/archive/p/json-simple/) - Licensed under the Apache License 2.0
+
+# kmkss_img_tool
+ An extraction tool for a certain ps2 visualnovel
 
 
 This project is based on amg_codec_tool's documentation (rev 0.5)
@@ -16,8 +16,8 @@ amg's sister game kmkss
 
 //refer in amg_codec_tool's doc for indepth information about the structure of ps2 iso and files associated with it.
 
--
-How to use:
+
+## How to use:
 
 After opening the program:
 
@@ -35,40 +35,40 @@ Parameters
 
 6 : ARC to IMG
 
--
+# Parameters
 
-
-Parameter 1:
+## Parameter 1:
 
 This will ask for an arc file to be extracted to JSON and scfTemp files in JSONextract and SCFextract folders.
 This will also make tmp.list files which will list all scffile names based on the arc file. 
 
 
-Parameter 2:
+## Parameter 2:
 
 This will ask for a folder cotaining JSON files and convert it to scf Files and be saved on SCFconvert
 
 
-Parameter 3:
+## Parameter 3:
 
 Will ask for folder containing SCF files to be converted to ARC file
 Filename: SCF_to_ARC.ARC
 
 
-Parameter 5:
+## Parameter 5:
 
 Will ask for IMG file to be conveted to arc File
 Filename: IMG_to_ARC.ARC
 
 
-Parameter 3:
+## Parameter 6:
 
 Will ask for ARC file to be converte to IMG file
 Filename: ARC_to_IMG.IMG
 
 
--
-JSON FILES 
+
+# JSON FILES 
+
 Just like in amg_codec_tool the project have a human readable file format for editing scripts for translation in json format
 and also has similar format as the xml in amgtool
 
@@ -85,7 +85,7 @@ Labels[ ]
 
 Entries[ ]
 
--
+## Type 5 entries
 Each type 5 entries (amgdoc page:8) will look like this:
 
 
@@ -110,8 +110,8 @@ toTranslate is a boolean 0|1 that indicate for the program to use tdata instean 
 
 
 
--
-SPECIAL THANKS
+
+## SPECIAL THANKS (CHECK THEM OUT!)
 
 nishishitranslations - https://nishishitranslations.wordpress.com/
 
@@ -123,6 +123,6 @@ and others contributed for amagami translations
 
 
 
-
+## to do
 
 //will fix this readme in december sorry for bed england
