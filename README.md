@@ -1,6 +1,13 @@
 # kmkss_img_tool
  An extraction tool for a certain ps2 visualnovel
 
+## Third-Party Libraries
+
+This project uses the following third-party libraries:
+
+- [json-simple](https://code.google.com/archive/p/json-simple/) - Licensed under the Apache License 2.0
+
+
 This project is based on amg_codec_tool's documentation (rev 0.5)
 https://code.google.com/archive/p/amg-codec-tool/
 and applied to java to make a custom extraction program for
@@ -98,6 +105,9 @@ Each type 5 entries (amgdoc page:8) will look like this:
 
 the xdata is the original text, tdata is the text that will replace xdata
 toTranslate is a boolean 0|1 that indicate for the program to use tdata instean xdata when using parameter 2
+
+
+
 
 
 -
