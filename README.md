@@ -120,7 +120,7 @@ Ts1 Ts2 .. etc for text size
 
 
 
-## SPECIAL THANKS (CHECK THEM OUT!)
+## SPECIAL THANKS / CREDITS (CHECK THEM OUT!)
 
 nishishitranslations - https://nishishitranslations.wordpress.com/
 
