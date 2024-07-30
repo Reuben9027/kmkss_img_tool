@@ -23,7 +23,7 @@ amg's sister game kmkss
 
 ## How to use:
 
-After opening the program:
+Use vscode or any ide and run the main file
 
 Parameters
 
@@ -110,7 +110,12 @@ Each type 5 entries (amgdoc page:8) will look like this:
 the xdata is the original text, tdata is the text that will replace xdata
 toTranslate is a boolean 0|1 that indicate for the program to use tdata instead of xdata when using parameter 2
 
+Recommend Full Width for alphanumeric 
 
+There are special expressions in xdata that could be used in tdata
+V00000 - voices
+
+Ts1 Ts2 .. etc for text size
 
 
 
