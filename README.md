@@ -5,18 +5,20 @@ This project uses the following third-party libraries:
 - [json-simple](https://code.google.com/archive/p/json-simple/) - Licensed under the Apache License 2.0
 
 # kmkss_img_tool
- An extraction tool for a certain ps2 visualnovel
+ An extraction tool for a certain PS2 visual novel
  
- //note: havent fully tested this ingame tho it boots the game
+ **CAN'T GUARANTEE TO WORK HAVENT FULLY TESTED A FULL GAME**
+
+**USE AT YOUR OWN RISK**
 
 
 This project is based on amg_codec_tool's documentation (rev 0.5)
 https://code.google.com/archive/p/amg-codec-tool/
-and applied to java to make a custom extraction program for
+and applied to Java to make a custom extraction program for
 amg's sister game kmkss
 
 
-//refer in amg_codec_tool's doc for indepth information about the structure of ps2 iso and files associated with it.
+//refer to amg_codec_tool's doc for in-depth information about the structure of ps2 iso and files associated with it.
 
 
 ## How to use:
@@ -25,24 +27,24 @@ After opening the program:
 
 Parameters
 
-1 : ARC file to JSON
+1: ARC file to JSON
 
-2 : JSON to SCFs
+2: JSON to SCFs
 
-3 : SCFs to ARC:
+3: SCFs to ARC:
 
-4 //debug dont use:
+4 //debug don't use:
 
-5 : IMG|PAC to ARC
+5: IMG|PAC to ARC
 
-6 : ARC to IMG
+6: ARC to IMG
 
 ## Parameters
 
 ### Parameter 1:
 
 This will ask for an arc file to be extracted to JSON and scfTemp files in JSONextract and SCFextract folders.
-This will also make tmp.list files which will list all scffile names based on the arc file. 
+This will also make tmp.list files which will list all scf file names based on the arc file. 
 
 
 ### Parameter 2:
@@ -106,7 +108,7 @@ Each type 5 entries (amgdoc page:8) will look like this:
 }
 
 the xdata is the original text, tdata is the text that will replace xdata
-toTranslate is a boolean 0|1 that indicate for the program to use tdata instean xdata when using parameter 2
+toTranslate is a boolean 0|1 that indicate for the program to use tdata instead of xdata when using parameter 2
 
 
 
