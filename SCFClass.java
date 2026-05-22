@@ -1,4 +1,4 @@
-//D:\Amagami\cpk\n0fre_me03A.scf
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,6 +18,47 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * Parses, serialises, and rebuilds SCF (Script Container File) objects used by
+ * the kmkss PS2 visual novel engine.
+ *
+ * <h2>SCF binary layout</h2>
+ * <pre>
+ *   [3 bytes]  magic "SCF"
+ *   [3 bytes]  unknown flags (preserved verbatim on round-trip)
+ *   [2× label] 1-byte length, 1 pad byte, N bytes of UTF-8 name
+ *   [2× var section]
+ *       [2 bytes] variable count (little-endian)
+ *       per variable: 1-byte id, 1-byte len, 1 pad, N bytes of name
+ *   [2× block section]
+ *       [2 bytes] block count (little-endian)
+ *       per block: 1-byte name len, 1 pad, name, 1-byte isMain, 1 pad,
+ *                  2-byte data len, data bytes
+ *   [2 bytes]  entry count (little-endian)
+ *   [entries]  type-dispatched records (see {@link SCFEntry})
+ * </pre>
+ *
+ * <h2>JSON round-trip format</h2>
+ * <p>Human-readable JSON mirrors the binary sections:
+ * <ul>
+ *   <li>{@code Labels}   — array of two label objects</li>
+ *   <li>{@code Variables} — 2-element outer array; each inner array holds
+ *       variable objects with {@code id}, {@code index}, {@code name},
+ *       and {@code name64} (Base64-encoded raw bytes)</li>
+ *   <li>{@code Blocks}   — same 2-group structure as variables</li>
+ *   <li>{@code Entries}  — flat array of entry objects</li>
+ *   <li>{@code Unknown}  — 3-byte flags preserved as integer map</li>
+ * </ul>
+ *
+ * <h2>Translation workflow (type-5 entries)</h2>
+ * <p>Entries with {@code type=5} carry Japanese dialogue. The JSON format
+ * stores the original text in {@code xdata} and a translation slot in
+ * {@code tdata}. Setting {@code toTranslate=1} causes {@link #jsonToSCF}
+ * to substitute {@code tdata} for {@code xdata} when rebuilding the binary.
+ *
+ * @see ARCClass
+ * @see ByteManip
+ */
 abstract class SCFAbstract extends ByteManip {
 
     public SCFAbstract(byte[] arr) {
