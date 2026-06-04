@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HexFormat;
 
 /**
@@ -12,7 +14,7 @@ abstract class ByteTool {
      * Reverses the bit order of an integer up to its highest set bit.
      *
      * <p>Example: {@code bitReverse(0b1011)} returns {@code 0b101} (3-bit
-     * reversal of the 4-bit value — note that only {@code bitCount(n)} bits
+     * reversal of the 4-bit value �? note that only {@code bitCount(n)} bits
      * are iterated).
      *
      * @param n the value whose bits should be reversed
@@ -41,9 +43,9 @@ abstract class ByteTool {
  * <ul>
  *   <li>{@link #cursorJump(int)} advances the cursor by {@code i} bytes and
  *       returns the <em>new</em> cursor position.</li>
- *   <li>{@link #cursorGetInt()} reads the byte at the <em>current</em> cursor
+ *   <li>{@link #cursorGetByte()} reads the byte at the <em>current</em> cursor
  *       position as an unsigned int without moving the cursor.</li>
- *   <li>{@link #jumpGet(int)} is a combined advance-then-read convenience.</li>
+ *   <li>{@link #jumpGetByte(int)} is a combined advance-then-read convenience.</li>
  * </ul>
  */
 public abstract class ByteManip extends ByteTool {
@@ -89,7 +91,7 @@ public abstract class ByteManip extends ByteTool {
      * with {@code size=4} return {@code 1}.
      *
      * @param loc  starting byte offset in {@link #arr}
-     * @param size number of bytes to read (1–4)
+     * @param size number of bytes to read (1??4)
      * @return the decoded unsigned integer value
      */
     int readMultipleByteReverse(int loc, int size) {
@@ -128,9 +130,9 @@ public abstract class ByteManip extends ByteTool {
      * @param i number of bytes to advance before reading
      * @return unsigned value of {@code arr[cursor]} after the jump
      */
-    int jumpGet(int i) {
+    int jumpGetByte(int i) {
         cursorJump(i);
-        return cursorGetInt();
+        return cursorGetByte();
     }
 
     /**
@@ -139,7 +141,7 @@ public abstract class ByteManip extends ByteTool {
      *
      * @return unsigned value of {@code arr[cursor]}
      */
-    int cursorGetInt() {
+    int cursorGetByte() {
         return Byte.toUnsignedInt(this.arr[this.cursor]);
     }
 
@@ -151,6 +153,14 @@ public abstract class ByteManip extends ByteTool {
      */
     int cursorJump(int i) {
         this.cursor += i;
+        return this.cursor;
+    }
+
+
+    /**
+     * @return returns the current location of the cursor
+     */
+    int getCursorLocation(){
         return this.cursor;
     }
 
@@ -167,4 +177,25 @@ public abstract class ByteManip extends ByteTool {
         copy(temp, x, y);
         return temp;
     }
+
+
+    static byte[] writeIntLE(int n){
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(n);
+
+        byte[] bytes = buffer.array();
+        return bytes;
+    }
+
+    static byte[] writeShortLE(short n){
+        ByteBuffer buffer = ByteBuffer.allocate(2);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(n);
+
+        byte[] bytes = buffer.array();
+        return bytes;
+    }
+
+
 }

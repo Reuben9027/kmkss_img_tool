@@ -101,7 +101,7 @@ Each type 5 entries (amgdoc page:8) will look like this:
       
       "type": 5,
       
-      "tdata": "ï¼®ï½ï¼¤ï½ï½”ï½",
+      "tdata": "?¼®?½ï¼¤?½??½”ï½?",
       
       "toTranslate": 0
       

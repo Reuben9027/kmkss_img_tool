@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Handles decoding (IMG/PAC â†’ ARC) and encoding (ARC â†’ IMG) using a custom
+ * Handles decoding (IMG/PAC â†? ARC) and encoding (ARC â†? IMG) using a custom
  * LZSS-variant compression scheme found in kmkss PS2 image containers.
  *
  * <h2>Compression format overview</h2>
@@ -12,17 +12,17 @@ import java.util.Arrays;
  * a 1-byte header whose bits indicate whether the corresponding data unit is
  * a literal byte ({@code bit=1}) or a back-reference ({@code bit=0}):
  * <ul>
- *   <li><b>Literal</b> â€” 1 byte of raw data copied directly to output.</li>
- *   <li><b>Back-reference</b> â€” 2-byte token encoding a sliding-window offset
- *       and match length. The 2048-byte (256Ã—8) ring buffer is pre-filled with
+ *   <li><b>Literal</b> â€? 1 byte of raw data copied directly to output.</li>
+ *   <li><b>Back-reference</b> â€? 2-byte token encoding a sliding-window offset
+ *       and match length. The 2048-byte (256Ã?8) ring buffer is pre-filled with
  *       zero bytes; the window start is {@code 0x7DE}.</li>
  * </ul>
  *
  * <p>The 2-byte reference token layout (little-endian word):
  * <pre>
- *   bits [7:0]   â†’ buffer offset within the 256-byte page (low byte)
- *   bits [12:8]  â†’ match length âˆ’ 3 (5 bits)
- *   bits [15:13] â†’ page selector (3 bits â†’ 256*sid + offset = buffer index)
+ *   bits [7:0]   â†? buffer offset within the 256-byte page (low byte)
+ *   bits [12:8]  â†? match length âˆ? 3 (5 bits)
+ *   bits [15:13] â†? page selector (3 bits â†? 256*sid + offset = buffer index)
  * </pre>
  *
  * @see ARCClass
@@ -40,14 +40,14 @@ public class PACClass extends ByteManip {
     }
 
     // -------------------------------------------------------------------------
-    // Static helper â€” token encoding
+    // Static helper â€? token encoding
     // -------------------------------------------------------------------------
 
     /**
      * Encodes a sliding-window back-reference into the 2-byte token format.
      *
-     * @param n    buffer index of the match start (0 â€“ 2047)
-     * @param size match length âˆ’ 3 (0 â€“ 31); stored in bits 12:8 of the token
+     * @param n    buffer index of the match start (0 â€? 2047)
+     * @param size match length âˆ? 3 (0 â€? 31); stored in bits 12:8 of the token
      * @return the packed 16-bit token value
      */
     static int toHBlockHeader(int n, int size) {
@@ -60,7 +60,7 @@ public class PACClass extends ByteManip {
     }
 
     // -------------------------------------------------------------------------
-    // Inner class â€” hash-assisted sliding-window search
+    // Inner class â€? hash-assisted sliding-window search
     // -------------------------------------------------------------------------
 
     /**
@@ -109,7 +109,7 @@ public class PACClass extends ByteManip {
     }
 
     // -------------------------------------------------------------------------
-    // Inner class â€” sliding window with O(1) lookup
+    // Inner class â€? sliding window with O(1) lookup
     // -------------------------------------------------------------------------
 
     /**
@@ -215,7 +215,7 @@ public class PACClass extends ByteManip {
     }
 
     // -------------------------------------------------------------------------
-    // Inner class â€” 8-entry output block
+    // Inner class â€? 8-entry output block
     // -------------------------------------------------------------------------
 
     /**
@@ -224,14 +224,14 @@ public class PACClass extends ByteManip {
      *
      * <p>Each call to {@link #add(int, boolean)} appends one unit:
      * <ul>
-     *   <li>{@code t=false} â€” literal byte, 1 byte of payload, flag bit set to 1.</li>
-     *   <li>{@code t=true}  â€” back-reference, 2 bytes of payload, flag bit set to 0.</li>
+     *   <li>{@code t=false} â€? literal byte, 1 byte of payload, flag bit set to 1.</li>
+     *   <li>{@code t=true}  â€? back-reference, 2 bytes of payload, flag bit set to 0.</li>
      * </ul>
      * The flag header is built LSB-first; bit {@code i} corresponds to the
      * {@code i}-th unit added.
      */
     class ReferenceBlock {
-        /** Raw payload bytes (up to 34 = 8 refs Ã— 2 bytes + alignment). */
+        /** Raw payload bytes (up to 34 = 8 refs Ã? 2 bytes + alignment). */
         byte[] array = new byte[34];
 
         /** Current write position in {@link #array}. */
@@ -318,12 +318,12 @@ public class PACClass extends ByteManip {
             int ref = buffer.find(value, bufStart);
 
             if (ref != -1 && len <= 34) {
-                // Match extended â€” keep trying a longer sequence
+                // Match extended â€? keep trying a longer sequence
                 oldRef = ref;
                 len++;
                 continue;
             } else if (len != 3) {
-                // Longest match found â€” emit reference token
+                // Longest match found â€? emit reference token
                 outputBlock.add(toHBlockHeader(oldRef, value.length - 4), true);
                 for (int i = 0; i < value.length - 1; i++) {
                     buffer.set(bufStart, value[i]);
@@ -333,7 +333,7 @@ public class PACClass extends ByteManip {
                 len    = 3;
                 cursorJump(value.length - 1);
             } else {
-                // No match â€” emit literal
+                // No match â€? emit literal
                 outputBlock.add(value[0], false);
                 buffer.set(bufStart, value[0]);
                 bufStart = (bufStart + 1) % (256 * 8);
@@ -373,7 +373,7 @@ public class PACClass extends ByteManip {
 
         try {
             while (this.cursor < arr.length) {
-                int blockHeader = cursorGetInt();
+                int blockHeader = cursorGetByte();
                 cursorJump(1);
 
                 for (int i = 0; i < 8; i++) {

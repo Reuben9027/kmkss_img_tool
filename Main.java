@@ -127,7 +127,7 @@ public class Main {
         try (FileWriter writer = new FileWriter(FILE_TMP_LIST)) {
             for (SCFClass scf : scfList) {
                 scf.decode();
-                scf.maakeJson();
+                scf.makeJson();
                 writer.append(scf.fileName).append("\n");
             }
         }

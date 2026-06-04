@@ -1,10 +1,16 @@
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,11 +32,11 @@ import org.json.simple.parser.ParseException;
  * <pre>
  *   [3 bytes]  magic "SCF"
  *   [3 bytes]  unknown flags (preserved verbatim on round-trip)
- *   [2× label] 1-byte length, 1 pad byte, N bytes of UTF-8 name
- *   [2× var section]
+ *   [2�? label] 1-byte length, 1 pad byte, N bytes of UTF-8 name
+ *   [2�? var section]
  *       [2 bytes] variable count (little-endian)
  *       per variable: 1-byte id, 1-byte len, 1 pad, N bytes of name
- *   [2× block section]
+ *   [2�? block section]
  *       [2 bytes] block count (little-endian)
  *       per block: 1-byte name len, 1 pad, name, 1-byte isMain, 1 pad,
  *                  2-byte data len, data bytes
@@ -41,13 +47,13 @@ import org.json.simple.parser.ParseException;
  * <h2>JSON round-trip format</h2>
  * <p>Human-readable JSON mirrors the binary sections:
  * <ul>
- *   <li>{@code Labels}   — array of two label objects</li>
- *   <li>{@code Variables} — 2-element outer array; each inner array holds
+ *   <li>{@code Labels}   �? array of two label objects</li>
+ *   <li>{@code Variables} �? 2-element outer array; each inner array holds
  *       variable objects with {@code id}, {@code index}, {@code name},
  *       and {@code name64} (Base64-encoded raw bytes)</li>
- *   <li>{@code Blocks}   — same 2-group structure as variables</li>
- *   <li>{@code Entries}  — flat array of entry objects</li>
- *   <li>{@code Unknown}  — 3-byte flags preserved as integer map</li>
+ *   <li>{@code Blocks}   �? same 2-group structure as variables</li>
+ *   <li>{@code Entries}  �? flat array of entry objects</li>
+ *   <li>{@code Unknown}  �? 3-byte flags preserved as integer map</li>
  * </ul>
  *
  * <h2>Translation workflow (type-5 entries)</h2>
@@ -105,14 +111,14 @@ public class SCFClass extends SCFAbstract {
         return temp;
     }
 
-    public void maakeJson() {
+    public void makeJson() {
         try {
-            if (this.fileName.equals("BG_Picture")) {
-                System.out.println();
-            }
+            
 
             String scfFile = String.format("%s.json", this.fileName);
-            FileWriter file = new FileWriter("JSONextract\\" + scfFile);
+            String path = "JSONextract\\" + scfFile;
+            Writer file = new OutputStreamWriter(new FileOutputStream(path), Charset.forName("Shift_JIS"));
+            // FileWriter file = new FileWriter();
 
             JSONArray[] arrayJSON = new JSONArray[5];
             String[] arrayName = { "Labels", "Variables", "Blocks", "Entries", "Unknown" };
@@ -156,7 +162,7 @@ public class SCFClass extends SCFAbstract {
             file.flush();
             file.close();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }
@@ -186,6 +192,7 @@ public class SCFClass extends SCFAbstract {
 
     class SCFLabel extends ScfPrototype {
 
+
         @Override
         public void print() {
             System.out.printf("LabelHeader #%d: %s\n", this.index, this.name);
@@ -210,8 +217,7 @@ public class SCFClass extends SCFAbstract {
 
         @Override
         public int groupNo() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'groupNo'");
+            return this.
         }
 
     }
@@ -259,7 +265,7 @@ public class SCFClass extends SCFAbstract {
 
     class SCFBlock extends ScfPrototype {
         int dataLen;
-        int isMain;
+        int numberOfArgs;
         String data;
         int group;
 
@@ -267,17 +273,17 @@ public class SCFClass extends SCFAbstract {
             super(ind, str);
         }
 
-        public SCFBlock(int ind, byte[] str, int dataLen, int isMain, byte[] data, int group) {
+        public SCFBlock(int ind, byte[] str, int dataLen, int noArgs, byte[] data, int group) {
             super(ind, str);
             this.dataLen = dataLen;
-            this.isMain = isMain;
+            this.numberOfArgs = noArgs;
             this.data = Base64.getEncoder().encodeToString(data);
             this.group = group;
         }
 
         @Override
         public void print() {
-            System.out.printf("Block: isMain = %d, dataLen = %d, index = %d , name: %s\n", this.isMain, this.dataLen,
+            System.out.printf("Block: noArgs = %d, dataLen = %d, index = %d , name: %s\n", this.numberOfArgs, this.dataLen,
                     this.index, this.name);
             System.out.printf("Data: %s\n", this.data);
         }
@@ -287,7 +293,7 @@ public class SCFClass extends SCFAbstract {
             this.jsonData.put("name64", this.name64);
             this.jsonData.put("index", this.index);
             this.jsonData.put("dataLen", this.dataLen);
-            this.jsonData.put("isMain", this.isMain);
+            this.jsonData.put("numberOfArgs", this.numberOfArgs);
             this.jsonData.put("name", this.name);
             this.jsonData.put("xdata", this.data);
 
@@ -323,14 +329,19 @@ public class SCFClass extends SCFAbstract {
             return 3;
         }
 
-        public SCFEntry(int ind, int type) {
+        public SCFEntry(int ind, int type, String filename) {
             this.type = type;
             this.index = ind;
             if (type == 8) {
-                this.decode();
+                this.decode(filename);
+                System.out.println(filename);
                 return;
             }
+            if(filename.equals("Album")){
+                System.out.println(filename+" "+cursor);
+            }
 
+            // System.out.println(type);
             switch (type) {
                 case 0:
                 case 2:
@@ -339,37 +350,40 @@ public class SCFClass extends SCFAbstract {
                     break;
                 case 1:
                 case 3:
-                    int data = 0;
-
-                    for (int i = 0; i < 4; i++) {
-                        int temp = jumpGet(1) << (8 * i);
-                        data += temp;
-                    }
+                    int data = readMultipleByteReverse(cursorJump(1), 4);
                     this.dataText = Integer.toHexString(data);
-                    cursorJump(1);
+                    cursorJump(4);
                     break;
-                default:
-                    int strLen = jumpGet(1);
+                case 5:
+                case 6:
+                case 7:
+                    int strLen = readMultipleByteReverse(cursorJump(1),2);
+                    // System.out.println(cursor);
                     byte[] str = construct(cursorJump(2), strLen);
-
                     try {
                         this.dataText = new String(str, "SHIFT-JIS");
-                        ;
+                        
+                        // System.out.println();
+                        // System.out.println(strLen);
+                        // System.out.println(this.dataText);
                     } catch (Exception e) {
                         // TODO: handle exception
                     }
                     cursorJump(strLen);
                     break;
+                default:
+                    // System.out.println(type);
+                    // System.out.println(filename);
+                    // System.out.println(Integer.toHexString(getCursorLocation()));
             }
         }
 
-        public void decode() {
-            cursorJump(1);
-            int entryLen = readMultipleByteReverse(cursor, 2);
+        public void decode(String filename) {
+            int entryLen = readMultipleByteReverse(cursorJump(1), 2);
             cursorJump(2);
             for (int i = 0; i < entryLen; i++) {
-                int entryType = cursorGetInt();
-                SCFEntry entry = new SCFEntry(i, entryType);
+                int entryType = cursorGetByte();
+                SCFEntry entry = new SCFEntry(i, entryType, filename);
                 this.list.add(entry);
             }
         }
@@ -397,7 +411,9 @@ public class SCFClass extends SCFAbstract {
             } else {
                 this.jsonData.put("xdata", this.dataText);
                 if (this.type == 5) {
-                    this.jsonData.put("tdata", "ＮｏＤａｔａ");
+                    String noData = "ＮＯＤＡＴＡ";
+                    // System.out.println(noData);
+                    this.jsonData.put("tdata", noData);
                     this.jsonData.put("toTranslate", 0);
                 }
 
@@ -422,58 +438,67 @@ public class SCFClass extends SCFAbstract {
             // TODO: handle exception
         }
 
-        if (this.fileName.equals("BG_Picture")) {
-            System.out.println();
-        }
+        // if (this.fileName.equals("BG_Picture")) {
+        //     System.out.println();
+        // }
 
+        //SCF Header
         String scfCheck = new String(Arrays.copyOfRange(arr, 0, 3));
 
         if (!scfCheck.equals(scfCheck)) {
             System.out.println("ERROR: NOT SCF filename: " + fileName);
         }
-        this.cursor = 3;
+        this.cursor = 3; //skips
 
+
+        //Label Header (don't change)
         this.unknown = Arrays.copyOfRange(arr, this.cursor, this.cursor + 3);
-        this.cursor = 6;
+        this.cursor = 6; //skips 3
 
+
+        //why is there 2 of them? note: this is label
+        //ans: refer to the 1.0 doc explained in final doc
         for (int i = 0; i < 2; i++) {
-            int strLen = cursorGetInt();
-            // System.out.println(this.cursor);
+            //TODO: fix this this hould be 2 bytes not 1 just a note
+            //Label name length
+            int strLen = readMultipleByteReverse(this.cursor, 2);
+            
+            //Label Name
             byte[] temp = construct(cursorJump(2), strLen);
             SCFLabel label = new SCFLabel(i, temp);
-
-            /*
-             * if (i == 0) {
-             * this.fileName = label.name;
-             * }
-             */
+            
 
             scfList.add(label);
             // labelList.add(label);
             cursorJump(strLen);
         }
 
-        for (int j = 0; j < 2; j++) {
-            int varLen = cursorGetInt();
+        //this is variables
+        
+        
+        for(int i = 0; i< 2; i++){
+            int numberOfVariables = readMultipleByteReverse(this.cursor, 2);
             cursorJump(2);
-            for (int i = 0; i < varLen; i++) {
-                int id = cursorGetInt();
-                int strLen = Byte.toUnsignedInt(this.arr[cursorJump(1)]);
-                SCFVariables currVariable = new SCFVariables(i, id,
-                        construct(cursorJump(2), strLen), j);
+            for (int j = 0; j < numberOfVariables; j++) {            
+                int id = cursorGetByte(); //get byte
+                int strLen = readMultipleByteReverse(cursorJump(1), 2);
+                SCFVariables currVariable = new SCFVariables(j, id,construct(cursorJump(2), strLen), i);
 
                 scfList.add(currVariable);
                 cursorJump(strLen);
             }
         }
+        
 
-        for (int j = 0; j < 2; j++) {
-            int blockLen = readMultipleByteReverse(this.cursor, 2);
+
+        //this is block or the functions in the latest doc1
+        for(int i =0; i< 2; i++){
+            int numberOfBlocks = readMultipleByteReverse(this.cursor, 2);
             cursorJump(2);
-            for (int i = 0; i < blockLen; i++) {
-                int strLen = cursorGetInt();
+            for (int j = 0; j < numberOfBlocks; j++) {
+                int strLen = readMultipleByteReverse(this.cursor, 2);
                 byte[] str = construct(cursorJump(2), strLen);
-                int isMain = Byte.toUnsignedInt(arr[cursorJump(strLen)]);
+                int numberOfArg = readMultipleByteReverse(cursorJump(strLen), 2);
 
                 int dataLen = readMultipleByteReverse(cursorJump(2), 2);
                 byte[] data = null;
@@ -484,21 +509,21 @@ public class SCFClass extends SCFAbstract {
                     System.out.println("blyat" + dataLen);
                 }
 
-                SCFBlock block = new SCFBlock(i, str, dataLen, isMain, data, j);
+                SCFBlock block = new SCFBlock(j, str, dataLen, numberOfArg, data, i);
                 scfList.add(block);
                 cursorJump(dataLen);
+                
             }
         }
+        
 
         int cursorSave = this.cursor;
+        int entrySize = readMultipleByteReverse(this.cursor, 2);
 
-        int entrySize = cursorGetInt();
-        entrySize += jumpGet(1) << 8;
-
-        cursorJump(1);
+        cursorJump(2);
         try {
             for (int i = 0; i < entrySize; i++) {
-                SCFEntry entry = new SCFEntry(i, cursorGetInt());
+                SCFEntry entry = new SCFEntry(i,this.cursorGetByte(), this.fileName);
                 // entryList.add(entry);
                 scfList.add(entry);
             }
@@ -518,7 +543,12 @@ public class SCFClass extends SCFAbstract {
         // + the another 3 bytes
 
         JSONParser parser = new JSONParser();
-        FileReader reader = new FileReader(json);
+
+        
+        Reader reader = new InputStreamReader(new FileInputStream(json), "Shift_JIS");
+
+
+        // FileReader reader = new FileReader(json);
         JSONObject mainJson = (JSONObject) parser.parse(reader);
 
         JSONArray unknownArray = (JSONArray) mainJson.get("Unknown");
@@ -534,8 +564,8 @@ public class SCFClass extends SCFAbstract {
             String name = (String) objTemp.get("name64");
             byte nameBytes[] = Base64.getDecoder().decode(name);
 
-            temp.write(nameBytes.length);
-            temp.write(0);
+
+            temp.write(writeShortLE((short)nameBytes.length));
             temp.write(nameBytes);
         }
 
@@ -544,8 +574,7 @@ public class SCFClass extends SCFAbstract {
         for (int j = 0; j < 2; j++) {
             JSONArray varArray = (JSONArray) varArray2.get(j);
 
-            temp.write(varArray.size());
-            temp.write(0);
+            temp.write(writeShortLE((short)varArray.size()));
             for (int i = 0; i < varArray.size(); i++) {
                 JSONObject objTemp = (JSONObject) varArray.get(i);
                 String name = (String) objTemp.get("name64");
@@ -553,11 +582,10 @@ public class SCFClass extends SCFAbstract {
 
                 int test = ((Long) objTemp.get("id")).intValue();
 
-                System.out.println(test);
+                // System.out.println(test);
 
                 temp.write(test);
-                temp.write(nameBytes.length);
-                temp.write(0);
+                temp.write(writeShortLE((short)nameBytes.length));
                 temp.write(nameBytes);
             }
         }
@@ -567,8 +595,7 @@ public class SCFClass extends SCFAbstract {
 
         for (int j = 0; j < 2; j++) {
             JSONArray blockArray = (JSONArray) blockArray2.get(j);
-            temp.write(blockArray.size());
-            temp.write(0);
+            temp.write(writeShortLE((short)blockArray.size()));
             for (int i = 0; i < blockArray.size(); i++) {
                 JSONObject objTemp = (JSONObject) blockArray.get(i);
                 String name = (String) objTemp.get("name64");
@@ -576,27 +603,21 @@ public class SCFClass extends SCFAbstract {
                 // byte[] nameJIS = name.getBytes("SHIFT-JIS");
 
                 // temp.write(0);
-                temp.write(nameBytes.length);
-                temp.write(0);
+                temp.write(writeShortLE((short)nameBytes.length));
                 temp.write(nameBytes);
-                temp.write(((Long) objTemp.get("isMain")).intValue());
-                temp.write(0);
+                int noArgs = ((Long) objTemp.get("numberOfArgs")).intValue();
+                temp.write(writeShortLE((short)noArgs));
 
                 String xdata = (String) objTemp.get("xdata");
                 byte[] data = Base64.getDecoder().decode(xdata);
 
-                for (int o = 0; o < 2; o++) {
-                    temp.write((data.length >> (8 * o)) % 0x100);
-                }
-
-                // temp.write(0);
+                temp.write(writeShortLE((short)data.length));
                 temp.write(data);
             }
         }
 
         JSONArray entriesArray = (JSONArray) mainJson.get("Entries");
-        temp.write(entriesArray.size() % (0x100));
-        temp.write(entriesArray.size() >> 8);
+        temp.write(writeShortLE((short)entriesArray.size()));
 
         for (int i = 0; i < entriesArray.size(); i++) {
             JSONObject objTemp = (JSONObject) entriesArray.get(i);
@@ -613,11 +634,7 @@ public class SCFClass extends SCFAbstract {
 
             JSONArray tempArray = (JSONArray) objTemp.get("elements");
 
-            for (int i = 0; i < 2; i++) {
-                temp.write((tempArray.size() >> (8 * i)) % 0x100);
-            }
-            // temp.write(tempArray.size());
-            // temp.write(0);
+            temp.write(writeShortLE((short)tempArray.size()));
             for (int i = 0; i < tempArray.size(); i++) {
                 jsonToSCFEntry(temp, (JSONObject) tempArray.get(i));
             }
@@ -634,6 +651,7 @@ public class SCFClass extends SCFAbstract {
 
         String xdataValue = (String) objTemp.get(keyTranslate);
 
+        // System.out.println(xdataValue);
         byte[] xdataJIS = xdataValue.getBytes("SHIFT-JIS");
         int xdataLen = xdataValue.length();
 
@@ -648,16 +666,11 @@ public class SCFClass extends SCFAbstract {
             case 3:
                 // int val = Integer.parseUnsignedInt(xdataValue, xdataLen)
                 int value = Integer.parseUnsignedInt(xdataValue, 16);
-                for (int i = 0; i < 4; i++) {
-                    temp.write((value >> (8 * i)) % 0x100);
-                }
+                temp.write(writeIntLE(value));
                 break;
 
             default:
-
-                temp.write(xdataJIS.length);
-
-                temp.write(0);
+                temp.write(writeShortLE((short)xdataJIS.length));
                 temp.write(xdataJIS);
                 break;
 
